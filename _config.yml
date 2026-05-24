@@ -1,0 +1,23 @@
+theme: jekyll-theme-cayman
+title: Horizon Daily
+description: AI-curated daily digest of tech and research news
+baseurl: "" # the subpath of your site, e.g. /blog. Use "" if using a custom domain, or "/repo-name" for project pages
+url: "" # the base hostname & protocol for your site, e.g. https://yourname.github.io
+
+# Build settings
+markdown: kramdown
+future: true # Allow future posts to be published
+plugins:
+  - jekyll-feed
+feed:
+  path: feed.xml
+exclude:
+  - ".github"
+  - "node_modules"
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "default"
