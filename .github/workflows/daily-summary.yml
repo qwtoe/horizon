@@ -7,6 +7,11 @@ on:
     # （UTC 18:00 = 北京 02:00），再由下一步等到 UTC 00:20（北京 08:20）开始抓取。
     - cron: '0 18 * * *'
   workflow_dispatch:      # Allow manual trigger
+    inputs:
+      skip_wait:
+        description: "立即执行（不等到北京 08:20 的发布窗口）"
+        type: boolean
+        default: false
 
 jobs:
   daily-summary:
@@ -26,6 +31,7 @@ jobs:
           python-version: "3.12"
 
       - name: Wait for publish window (北京 08:20 / UTC 00:20)
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.skip_wait }}
         run: python3 scripts/wait_for_window.py
 
       - name: Install uv
