@@ -2,12 +2,17 @@ name: Daily Horizon Summary
 
 on:
   schedule:
-    - cron: '30 0 * * *'  # 每天北京时间 08:30 (UTC 00:30)
+    # GitHub 的 schedule 触发普遍比设定时间晚（本仓库 144 次运行实测：中位数 +4.3 小时，
+    # 最快 +1.4 小时，最慢 +11 小时），所以这里不直接定在目标时间，而是提前触发
+    # （UTC 18:00 = 北京 02:00），再由下一步等到 UTC 00:20（北京 08:20）开始抓取。
+    - cron: '0 18 * * *'
   workflow_dispatch:      # Allow manual trigger
 
 jobs:
   daily-summary:
     runs-on: ubuntu-latest
+    # 等待窗口最多 5h30m，加上抓取与部署仍要留在 GitHub 单任务 6 小时的上限内
+    timeout-minutes: 355
     permissions:
       contents: write  # Needed to commit changes
 
@@ -19,6 +24,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Wait for publish window (北京 08:20 / UTC 00:20)
+        run: python3 scripts/wait_for_window.py
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
